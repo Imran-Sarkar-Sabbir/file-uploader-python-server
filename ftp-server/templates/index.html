@@ -96,10 +96,10 @@
 
         {%for content in content_list%}
         <!-- An Item -->
-        <a class="path-link" href={{content["path"]}}>
+        <a class="path-link" href={{content["url"]}}>
             <div class="list-item">
                 <p class="content-text">
-                    {{content["path"]}}
+                    {{content["name"]}}
                     {% if content["type"] == "directory" %}
                     /
                     {% endif %}

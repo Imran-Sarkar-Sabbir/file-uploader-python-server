@@ -1,6 +1,7 @@
-from flask import Flask, request, render_template, send_from_directory
 import sys
 import os
+from urllib.parse import quote
+from flask import Flask, request, render_template, send_from_directory
 
 FTP_DIR_NAME = "shared"
 
@@ -11,12 +12,11 @@ if not os.path.exists(f'../{FTP_DIR_NAME}'):
     os.makedirs(f'../{FTP_DIR_NAME}')
 
 
+def urlEncode(url):
+    return quote(url)
+    
 
-# @app.route('/<path:path>')
-# def sendFile(path):
-#     root_dir = os.getcwd()
-#     
-
+print(urlEncode("hello World"))
 def serveFile(path):
     base_dir_pair = os.path.split(path)
     return send_from_directory(directory= base_dir_pair[0], path=base_dir_pair[1], as_attachment=True)
@@ -34,29 +34,41 @@ def format_file_size(size):
     size_string = "{:.2f}{}".format(size, suffixes[suffix_index])
     return size_string
 
-def serveDirectory(path): 
+def serveDirectory(path, root_path, hasPrev = False, ): 
     dir_contents = os.listdir(path)
 
     content_list = []
 
-    for item in dir_contents:
-        item_path = os.path.join(path, item)
-        if os.path.isfile(item_path):
-            content_list.append({
-                "type": "file",
-                "path": item,
-                "size": format_file_size(os.path.getsize(item_path))
-            })
-        elif os.path.isdir(item_path):
-            content_list.append({
-                "type": "directory",
-                "path": item
+    
+
+    if(hasPrev): 
+        content_list.append({
+                "name": "..",
+                "url": os.path.dirname(root_path),
             })
 
+    for item in dir_contents:
+        item_path = os.path.join(path, item)
+        print(root_path)
+        content = {
+                "name": item,
+                "url": urlEncode( os.path.join( root_path , item)),
+        }
+        
+        if os.path.isfile(item_path):
+            content["type"] = "file"
+            content["size"] = format_file_size(os.path.getsize(item_path))
+        elif os.path.isdir(item_path):
+            content["type"] = "directory"
+            content["name"] = item
+        
+        content_list.append(content)
+    
     return render_template('index.html', content_list = content_list)
 
 @app.route('/<path:path>')
 def serve_directory(path):
+    print(path)
     root_dir = os.getcwd()
     dir_path = os.path.join(root_dir, '..', FTP_DIR_NAME , path)
     
@@ -64,7 +76,7 @@ def serve_directory(path):
         return serveFile(dir_path)
     
     elif os.path.isdir(dir_path):
-        return serveDirectory(dir_path)
+        return serveDirectory(dir_path, hasPrev= path!='', root_path=path)
     
 
 
