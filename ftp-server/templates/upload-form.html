@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload file</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css" rel="stylesheet">
+
+    <style>
+        html {
+            padding: 8px;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        #input-box {
+            width: 100%;
+            min-height: 200px;
+            height: auto;
+            padding: 16px 0px;
+            border: 2px dashed #ccc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        #input-box.highlight {
+            border-color: #4CAF50;
+        }
+
+        .file-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .progress-bar {
+            width: auto;
+            height: 30px;
+            margin: 20px 0px;
+            border-radius: 50px;
+            background-color: #f0f0f0;
+            margin-bottom: 10px;
+        }
+
+        .progress {
+            height: 100%;
+            border-radius: 50px;
+            background-color: rgb(69, 171, 71);
+            transition: width 0.1s ease-in-out;
+        }
+
+        .file-input {
+            margin-bottom: 10px;
+        }
+
+        #upload-btn {
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 8px;
+            outline: none;
+            border: none;
+            background-color: rgb(63, 63, 189);
+            color: wheat;
+            font-size: 20px;
+            font-weight: 800;
+            display: inline-block;
+        }
+
+        #upload-btn:hover,
+        #upload-btn:active {
+            background-color: rgb(37, 37, 187);
+            scale: .95;
+            transition: scale 200ms;
+        }
+
+        #file-info {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .file-icon {
+            margin: auto;
+        }
+
+        .file-name {
+            padding: 8%;
+            font-family: monospace;
+            font-size: 18px;
+            font-weight: 600;
+            word-wrap: break-word;
+        }
+
+        .progress-bar {
+            position: relative;
+        }
+
+        #percentage-label {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            line-height: 0%;
+            font-size: 20px;
+            font-weight: 400;
+        }
+
+        #upload-btn:focus,
+        #upload-btn:active {
+            outline: none;
+            border: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="input-box">
+        <input type="file" id="file-input" style="display:none;">
+        <div id="file-info" style="display:none;">
+            <i class="file-icon"></i>
+            <p class="file-name"></p>
+        </div>
+        <p id="input-message">Drag and drop a file here, or click to select a file.</p>
+    </div>
+
+    <div class="progress-bar">
+        <div class="progress" id="progress"></div>
+        <div id="percentage-label">0%</div>
+    </div>
+
+    <center>
+        <button id="upload-btn">Upload</button>
+    </center>
+
+    <script>
+        const inputBox = document.getElementById('input-box');
+        const fileInput = document.getElementById('file-input');
+        const progressBar = document.getElementById('progress');
+        const percentageLabel = document.getElementById('percentage-label');
+        const uploadBtn = document.getElementById('upload-btn');
+        const fileInfo = document.getElementById('file-info');
+        const fileIcon = document.querySelector('.file-icon');
+        const fileName = document.querySelector('.file-name');
+        const inputMessage = document.getElementById('input-message');
+
+
+        const setPercentage = (percentage) => {
+            percentage = Math.round(percentage);
+            progressBar.style.width = `${percentage}%`;
+            percentageLabel.innerHTML = `${percentage}%`;
+        }
+
+        setPercentage(0);
+
+
+        // Highlight the input box when a file is dragged over it.
+        inputBox.addEventListener('dragover', (event) => {
+            event.preventDefault();
+            inputBox.classList.add('highlight');
+        });
+
+        // Unhighlight the input box when a file is no longer being dragged over it.
+        inputBox.addEventListener('dragleave', () => {
+            inputBox.classList.remove('highlight');
+        });
+
+        // Handle the dropped file.
+        inputBox.addEventListener('drop', (event) => {
+            event.preventDefault();
+            inputBox.classList.remove('highlight');
+
+            const files = event.dataTransfer.files;
+
+
+            // Show the file icon and name.
+            fileInfo.style.display = 'flex';
+            fileIcon.className = `file-icon ${getFileIconClass(files[0].type)}`;
+            fileName.textContent = files[0].name;
+            fileInput.files = files;
+
+            const reader = new FileReader();
+
+            reader.onload = () => {
+            };
+
+            reader.readAsText(files[0]);
+            inputMessage.style.display = 'none';
+        });
+
+        // Open the file input when the input box is clicked.
+        inputBox.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        // Handle the selected file.
+        fileInput.addEventListener('change', () => {
+            setPercentage(0);
+            const file = fileInput.files[0];
+
+            // Show the file icon and name.
+            fileInfo.style.display = 'flex';
+            fileIcon.className = `file-icon ${getFileIconClass(file.type)}`;
+            fileName.textContent = file.name;
+
+            const reader = new FileReader();
+
+            reader.onload = () => {
+                console.log("File loaded.");
+            };
+
+            reader.readAsText(file);
+            inputMessage.style.display = 'none';
+        });
+
+        // Get the CSS class for a file type.
+        function getFileIconClass(fileType) {
+            switch (fileType) {
+                case 'text/plain':
+                    return 'far fa-file-alt';
+                case 'application/pdf':
+                    return 'far fa-file-pdf';
+                case 'image/jpeg':
+                case 'image/png':
+                    return 'far fa-file-image';
+                case 'application/zip':
+                    return 'far fa-file-archive';
+                default:
+                    return 'far fa-file';
+            }
+        }
+
+        uploadBtn.addEventListener('click', () => {
+            const file = fileInput.files[0];
+            const xhr = new XMLHttpRequest();
+
+            // Handle progress updates.
+            xhr.upload.addEventListener('progress', (event) => {
+                if (event.lengthComputable) {
+                    const percentage = (event.loaded / event.total) * 100;
+                    setPercentage(percentage);
+                }
+            });
+
+            // Handle successful upload.
+            xhr.upload.addEventListener('load', () => {
+                percentageLabel.innerHTML = `Upload Successful`;
+            });
+
+            // Handle upload errors.
+            xhr.upload.addEventListener('error', () => {
+                alert('Error uploading file.');
+            });
+
+            // Set up and send the request.
+            xhr.open('POST', '/shared/upload');
+            const formData = new FormData();
+            formData.append('file', file);
+
+            xhr.onerror = (err) => {
+                setPercentage(0);
+                alert("Upload failed.");
+            }
+
+            xhr.abort = (err) => {
+                setPercentage(0);
+                alert("Upload failed.");
+            }
+
+
+
+            xhr.send(formData);
+
+        });
+    </script>
+</body>
+
+</html>

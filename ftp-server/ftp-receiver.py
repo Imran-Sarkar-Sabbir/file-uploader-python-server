@@ -23,7 +23,23 @@ def serveFile(path):
 
 def serveDirectory(path): 
     dir_contents = os.listdir(path)
-    return '<br>'.join(dir_contents)
+
+    content_list = []
+
+    for item in dir_contents:
+        item_path = os.path.join(path, item)
+        if os.path.isfile(item_path):
+            content_list.append({
+                "type": "file",
+                "path": item
+            })
+        elif os.path.isdir(item_path):
+            content_list.append({
+                "type": "directory",
+                "path": item
+            })
+
+    return render_template('index.html', content_list = content_list)
 
 @app.route('/<path:path>')
 def serve_directory(path):
@@ -44,7 +60,7 @@ def index():
 
 @app.route('/upload')
 def upload():
-    return render_template('index.html')
+    return render_template('upload-form.html')
 
 @app.route('/shared/upload', methods=['POST'])
 def uploadHandler():
