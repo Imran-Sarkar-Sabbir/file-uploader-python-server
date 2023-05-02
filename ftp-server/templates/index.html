@@ -60,6 +60,10 @@
             text-decoration: none;
         }
 
+        .list-item-header>* {
+            font-weight: bold;
+        }
+
         .list-item {
             border-bottom: 1px solid rgba(62, 55, 59, 0.551);
             padding: 8px 12px;
@@ -83,6 +87,13 @@
     </header>
 
     <div class="list-content">
+
+        <div class="list-item list-item-header">
+            <p class="content-text">Name</p>
+            <p class="content-size">Size</p>
+        </div>
+
+
         {%for content in content_list%}
         <!-- An Item -->
         <a class="path-link" href={{content["path"]}}>
