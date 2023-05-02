@@ -21,6 +21,19 @@ def serveFile(path):
     base_dir_pair = os.path.split(path)
     return send_from_directory(directory= base_dir_pair[0], path=base_dir_pair[1], as_attachment=True)
 
+def format_file_size(size):
+    # Determine the appropriate suffix and scaling factor
+    suffixes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB']
+    scaling_factor = 1024
+    suffix_index = 0
+    while size > scaling_factor and suffix_index < len(suffixes) - 1:
+        suffix_index += 1
+        size /= scaling_factor
+    
+    # Format the size string with the appropriate suffix
+    size_string = "{:.2f}{}".format(size, suffixes[suffix_index])
+    return size_string
+
 def serveDirectory(path): 
     dir_contents = os.listdir(path)
 
@@ -31,7 +44,8 @@ def serveDirectory(path):
         if os.path.isfile(item_path):
             content_list.append({
                 "type": "file",
-                "path": item
+                "path": item,
+                "size": format_file_size(os.path.getsize(item_path))
             })
         elif os.path.isdir(item_path):
             content_list.append({

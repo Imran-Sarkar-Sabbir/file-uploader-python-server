@@ -13,6 +13,8 @@
     {% if content["type"] == "file" %}
     <p>file</p>
     <p>{{content["path"]}}</p>
+    <p>size</p>
+    <p>{{content["size"]}}</p>
     {% else%}
     <p>dir</p>
     <p>{{content["path"]}}</p>
