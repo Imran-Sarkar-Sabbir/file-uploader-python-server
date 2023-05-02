@@ -6,21 +6,100 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+
+    <style>
+        * {
+            margin: 0px;
+            padding: 0px;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .header {
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 0px 12px;
+            background-color: rgb(32, 68, 87);
+        }
+
+        .upload-btn {
+            padding: 8px 12px;
+            border-radius: 12px;
+            font-size: 20px;
+            font-weight: 600;
+            color: white;
+            background-color: rgb(19, 175, 155);
+            text-decoration: none;
+        }
+
+
+        .upload-btn:active,
+        .upload-btn:focus,
+        .path-link:visited {
+            border: none;
+            outline: none;
+            text-decoration: none;
+        }
+
+
+        .list-content {
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            overflow-x: hidden;
+            height: auto;
+            width: 100%;
+        }
+
+        .path-link,
+        .path-link:active,
+        .path-link:visited {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .list-item {
+            border-bottom: 1px solid rgba(62, 55, 59, 0.551);
+            padding: 8px 12px;
+            gap: 12px;
+            display: flex;
+        }
+
+        .content-text {
+            width: min(550px, 80%);
+        }
+    </style>
+
 </head>
 
 <body>
-    {%for content in content_list%}
-    {% if content["type"] == "file" %}
-    <p>file</p>
-    <p>{{content["path"]}}</p>
-    <p>size</p>
-    <p>{{content["size"]}}</p>
-    {% else%}
-    <p>dir</p>
-    <p>{{content["path"]}}</p>
-    {% endif %}
-    <br />
-    {%endfor%}
+
+    <header class="header">
+        <a href="/upload" class="upload-btn">
+            Upload File
+        </a>
+    </header>
+
+    <div class="list-content">
+        {%for content in content_list%}
+        <!-- An Item -->
+        <a class="path-link" href={{content["path"]}}>
+            <div class="list-item">
+                <p class="content-text">
+                    {{content["path"]}}
+                    {% if content["type"] == "directory" %}
+                    /
+                    {% endif %}
+                </p>
+                {% if content["type"] == "file" %}
+                <p class="content-size">{{content["size"]}}</p>
+                {% endif %}
+            </div>
+        </a>
+        {%endfor%}
+    </div>
 </body>
 
 </html>
