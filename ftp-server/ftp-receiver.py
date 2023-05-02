@@ -1,6 +1,6 @@
 import sys
 import os
-from urllib.parse import quote
+from urllib.parse import quote, unquote
 from flask import Flask, request, render_template, send_from_directory
 
 FTP_DIR_NAME = "shared"
@@ -42,9 +42,12 @@ def serveDirectory(path, root_path, hasPrev = False, ):
     
 
     if(hasPrev): 
+        prevDir = os.path.dirname(root_path)
+        prevDir =   urlEncode(prevDir) if prevDir != '' else "/"
+
         content_list.append({
-                "name": "..",
-                "url": os.path.dirname(root_path),
+                "name": "../",
+                "url": prevDir,
             })
 
     for item in dir_contents:
@@ -52,7 +55,7 @@ def serveDirectory(path, root_path, hasPrev = False, ):
         print(root_path)
         content = {
                 "name": item,
-                "url": urlEncode( os.path.join( root_path , item)),
+                "url": urlEncode( os.path.join(unquote(root_path) , item)),
         }
         
         if os.path.isfile(item_path):
