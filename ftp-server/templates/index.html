@@ -97,6 +97,10 @@
         {%for content in content_list%}
         <!-- An Item -->
         <a class="path-link" href={{content["url"]}}>
+
+            {% if content["is_image"] == True %}
+            <img src={{content["url"]}} alt="image" height="160px" />
+            {% endif %}
             <div class="list-item">
                 <p class="content-text">
                     {{content["name"]}}

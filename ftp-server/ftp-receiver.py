@@ -1,5 +1,6 @@
 import sys
 import os
+import imghdr
 from urllib.parse import quote, unquote
 from flask import Flask, request, render_template, send_from_directory
 
@@ -34,6 +35,10 @@ def format_file_size(size):
     size_string = "{:.2f}{}".format(size, suffixes[suffix_index])
     return size_string
 
+
+def is_image(filename):
+    return filename.endswith((".png", ".jpg", ".jpeg", ".webp", ".gif"))
+
 def serveDirectory(path, root_path, hasPrev = False, ): 
     dir_contents = os.listdir(path)
 
@@ -53,9 +58,11 @@ def serveDirectory(path, root_path, hasPrev = False, ):
     for item in dir_contents:
         item_path = os.path.join(path, item)
         print(root_path)
+        url = urlEncode( os.path.join(unquote(root_path) , item))
         content = {
                 "name": item,
-                "url": urlEncode( os.path.join(unquote(root_path) , item)),
+                "url": url,
+                "is_image": is_image(url)
         }
         
         if os.path.isfile(item_path):
@@ -94,7 +101,9 @@ def upload():
 @app.route('/shared/upload', methods=['POST'])
 def uploadHandler():
     file = request.files['file']
-    file.save(f'../{FTP_DIR_NAME}/'+file.filename)
+    print(file)
+    res = file.save(f'../{FTP_DIR_NAME}/'+file.filename)
+    print(res)
     return 'File uploaded successfully!'
 
 
